@@ -59,7 +59,7 @@ export default function ViagemScreen() {
         colors={['#210C33', '#2E193F', '#593B6D', '#8B6A9B', '#D2C4DC', '#F5F5F5']}
         locations={[0, 0.18, 0.34, 0.50, 0.70, 1]}
         start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.55, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={styles.hero}
       />
 
@@ -77,7 +77,7 @@ export default function ViagemScreen() {
             <Text style={styles.heroSubtitle}>Planeje sua viagem e os melhores{`\n`}pontos de recarga</Text>
           </View>
 
-          <Image source={travelMap} style={styles.travelMap} resizeMode="contain" />
+          <Image source={travelMap} style={styles.travelMap} />
         </View>
 
         <Shadow style={styles.routeCard}>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     color: '#E7DEEB', fontFamily: 'Karla_400Regular', fontSize: s(12), lineHeight: s(19), marginTop: s(10),
   },
   travelMap: {
-    position: 'absolute', right: s(-7), top: s(-37), width: s(224), height: s(160), zIndex: 1,
+    position: 'absolute', right: s(-7), top: s(-37), width: s(254), height: s(250), zIndex: 1,
   },
   shadow: {
     shadowColor: '#000000', shadowOffset: { width: 0, height: s(3) }, shadowOpacity: 0.17,
