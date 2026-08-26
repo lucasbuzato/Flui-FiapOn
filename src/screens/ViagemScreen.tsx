@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Dimensions,
   Image,
-  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -14,29 +13,36 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 
 const { width: W, height: H } = Dimensions.get('window');
+const wp = (value: number) => (value / 100) * W;
+const hp = (value: number) => (value / 100) * H;
 const scale = Math.min(W / 393, 1.15);
 const s = (value: number) => Math.round(value * scale);
-const wp = (pct: number) => (pct / 100) * W;
-const hp = (pct: number) => (pct / 100) * H;
 
-// ============================================================
-// ASSETS DA TELA
-// ============================================================
-// Navbar: reutiliza exatamente os mesmos assets da HomeScreen.
+/*
+ * ASSETS DA TELA DE VIAGEM
+ *
+ * Coloque os 4 arquivos fornecidos nesta conversa em:
+ * assets/images/viagem/
+ *
+ * Nomes esperados:
+ * - Data Transfer.png       -> botão de inverter origem/destino
+ * - Paper Plane.png         -> origem
+ * - location-pin.png        -> destino / viagens
+ * - travel-map.png          -> ilustração principal
+ *
+ * O restante da tela reutiliza os assets da HomeScreen, principalmente a navbar.
+ */
+const travelMap = require('../../assets/images/viagem/travel-map.png');
+const paperPlane = require('../../assets/images/viagem/Paper Plane.png');
+const locationPin = require('../../assets/images/viagem/location-pin.png');
+const dataTransfer = require('../../assets/images/viagem/Data Transfer.png');
+
+// Navbar — exatamente os mesmos assets já usados na HomeScreen.
 const homeIcon = require('../../assets/images/home.png');
 const roadIcon = require('../../assets/images/road.png');
 const bookmarkIcon = require('../../assets/images/bookmark.png');
 const usersIcon = require('../../assets/images/users.png');
 const lightningBolt = require('../../assets/images/lightning-bolt.png');
-
-// Imagens específicas desta tela.
-// Você pode trocar os links abaixo por assets locais quando tiver as imagens.
-// Ex.: const TRAVEL_ILLUSTRATION = require('../../assets/images/viagem.png');
-const TRAVEL_ILLUSTRATION_URI = 'COLOQUE_AQUI_O_LINK_DA_ILUSTRACAO_DA_VIAGEM';
-const ORIGIN_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DE_ORIGEM';
-const DESTINATION_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DE_DESTINO';
-const HOME_TRIP_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DA_VIAGEM_1';
-const CAR_TRIP_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DA_VIAGEM_2';
 
 const NAV_BAR_HEIGHT = hp(8);
 const NAV_BUTTON_SIZE = wp(14);
@@ -49,28 +55,26 @@ function RecentTrip({
   title,
   subtitle,
   time,
-  iconUri,
+  icon,
 }: {
   title: string;
   subtitle: string;
   time: string;
-  iconUri: string;
+  icon: any;
 }) {
   return (
     <Shadow style={styles.tripCard}>
       <View style={styles.tripIcon}>
-        <Image
-          source={{ uri: iconUri }}
-          style={styles.tripIconImage}
-          resizeMode="contain"
-        />
+        <Image source={icon} style={styles.tripIconImage} resizeMode="contain" />
       </View>
+
       <View style={styles.tripInfo}>
         <Text style={styles.tripTitle}>{title}</Text>
         <Text style={styles.tripSubtitle}>{subtitle}</Text>
       </View>
+
       <View style={styles.tripTime}>
-        <Text style={styles.bolt}>ϟ</Text>
+        <Image source={lightningBolt} style={styles.tripBolt} resizeMode="contain" />
         <Text style={styles.tripTimeText}>{time}</Text>
       </View>
     </Shadow>
@@ -82,19 +86,22 @@ export default function ViagemScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
+      {/* Fundo/gradiente do topo */}
       <LinearGradient
-        colors={['#210C33', '#321246', '#78568A', '#FFFFFF']}
-        locations={[0, 0.34, 0.67, 1]}
-        start={{ x: 0.2, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
+        colors={['#210C33', '#321246', '#654477', '#BBAEC3', '#F5F5F5']}
+        locations={[0, 0.28, 0.52, 0.72, 1]}
+        start={{ x: 0.15, y: 0 }}
+        end={{ x: 0.55, y: 1 }}
         style={styles.hero}
       />
 
       <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         bounces={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.scrollContent}
       >
+        {/* ================= HEADER ================= */}
         <View style={styles.heroContent}>
           <View style={styles.heroCopy}>
             <Text style={styles.heroTitle}>Para onde</Text>
@@ -104,25 +111,20 @@ export default function ViagemScreen() {
             </Text>
           </View>
 
-          {/* Imagem principal da viagem: troque TRAVEL_ILLUSTRATION_URI pelo link/asset final. */}
-          <View style={styles.mapPlaceholder}>
-            <Image
-              source={{ uri: TRAVEL_ILLUSTRATION_URI }}
-              style={styles.travelIllustration}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={travelMap}
+            style={styles.travelMap}
+            resizeMode="contain"
+          />
         </View>
 
+        {/* ================= ORIGEM / DESTINO ================= */}
         <Shadow style={styles.routeCard}>
           <View style={styles.locationRow}>
             <View style={styles.locationIconWrap}>
-              <Image
-                source={{ uri: ORIGIN_ICON_URI }}
-                style={styles.locationIconImage}
-                resizeMode="contain"
-              />
+              <Image source={paperPlane} style={styles.paperPlaneIcon} resizeMode="contain" />
             </View>
+
             <View style={styles.locationText}>
               <Text style={styles.locationLabel}>De onde você está saindo?</Text>
               <Text style={styles.locationValue}>Curitiba, PR</Text>
@@ -133,12 +135,9 @@ export default function ViagemScreen() {
 
           <View style={styles.locationRow}>
             <View style={styles.locationIconWrap}>
-              <Image
-                source={{ uri: DESTINATION_ICON_URI }}
-                style={styles.locationIconImage}
-                resizeMode="contain"
-              />
+              <Image source={locationPin} style={styles.locationPinIcon} resizeMode="contain" />
             </View>
+
             <View style={styles.locationText}>
               <Text style={styles.locationLabel}>Para onde você vai?</Text>
               <Text style={styles.locationValue}>Guarulhos, SP</Text>
@@ -146,23 +145,25 @@ export default function ViagemScreen() {
           </View>
 
           <Pressable style={styles.swapButton} accessibilityLabel="Inverter origem e destino">
-            <Text style={styles.swapText}>↕</Text>
+            <Image source={dataTransfer} style={styles.swapIcon} resizeMode="contain" />
           </Pressable>
         </Shadow>
 
+        {/* ================= VIAGENS RECENTES ================= */}
         <Text style={styles.sectionTitle}>Viagens Recentes</Text>
 
         <RecentTrip
           title="Casa na Praia"
           subtitle="Ponta Grossa"
           time="40 min"
-          iconUri={HOME_TRIP_ICON_URI}
+          icon={locationPin}
         />
+
         <RecentTrip
           title="Beto Carreiro"
           subtitle="Santa Catarina"
           time="2:30 h"
-          iconUri={CAR_TRIP_ICON_URI}
+          icon={paperPlane}
         />
 
         <Pressable style={styles.planButton} accessibilityRole="button">
@@ -170,7 +171,9 @@ export default function ViagemScreen() {
         </Pressable>
       </ScrollView>
 
-      {/* Bottom Navigation Bar — reutilizada da HomeScreen */}
+      {/* ==========================================================
+          NAVBAR — REUTILIZA A MESMA ESTRUTURA DA HOMESCREEN
+         ========================================================== */}
       <View style={styles.navContainer}>
         <View style={styles.navBarBg} />
 
@@ -188,10 +191,7 @@ export default function ViagemScreen() {
           </Svg>
         </View>
 
-        <Pressable
-          style={styles.navCenterBtn}
-          accessibilityLabel="Carregar"
-        >
+        <Pressable style={styles.navCenterBtn} accessibilityLabel="Carregar">
           <Image
             source={lightningBolt}
             style={styles.navCenterIcon}
@@ -229,6 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+
   hero: {
     position: 'absolute',
     top: 0,
@@ -238,179 +239,222 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: s(45),
     borderBottomRightRadius: s(45),
   },
-  content: {
-    paddingTop: s(64),
-    paddingBottom: s(115),
+
+  scrollView: {
+    flex: 1,
   },
+
+  scrollContent: {
+    paddingTop: s(61),
+    paddingBottom: NAV_BAR_HEIGHT + s(40),
+  },
+
   heroContent: {
-    minHeight: s(145),
+    minHeight: s(172),
     paddingHorizontal: s(33),
     flexDirection: 'row',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
+
   heroCopy: {
     paddingTop: s(8),
     zIndex: 2,
+    width: s(178),
   },
+
   heroTitle: {
     color: '#FFFFFF',
-    fontSize: s(20),
-    lineHeight: s(29),
     fontFamily: 'Karla_700Bold',
-    letterSpacing: 0.2,
+    fontSize: s(20),
+    lineHeight: s(28),
+    letterSpacing: 0.1,
   },
+
   heroSubtitle: {
-    color: '#E6DDEB',
-    fontSize: s(13),
-    lineHeight: s(20),
+    color: '#E7DEEB',
     fontFamily: 'Karla_400Regular',
+    fontSize: s(12),
+    lineHeight: s(18),
     marginTop: s(11),
   },
-  mapPlaceholder: {
-    width: s(190),
-    height: s(135),
-    marginTop: s(-5),
-    marginRight: s(-23),
-    alignItems: 'center',
-    justifyContent: 'center',
+
+  travelMap: {
+    width: s(154),
+    height: s(168),
+    marginTop: s(-12),
+    marginRight: s(-8),
   },
-  travelIllustration: {
-    width: '100%',
-    height: '100%',
-  },
+
   shadow: {
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: s(3) },
-    shadowOpacity: 0.18,
-    shadowRadius: s(4),
-    elevation: 4,
+    shadowOpacity: 0.17,
+    shadowRadius: s(5),
+    elevation: 5,
   },
+
   routeCard: {
     marginHorizontal: s(33),
-    marginTop: s(8),
-    minHeight: s(191),
+    marginTop: s(1),
+    minHeight: s(190),
     backgroundColor: '#FFFFFF',
     borderRadius: s(16),
-    paddingHorizontal: s(26),
-    paddingVertical: s(17),
+    paddingHorizontal: s(25),
+    paddingVertical: s(14),
     position: 'relative',
   },
+
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: s(67),
+    minHeight: s(73),
   },
+
   locationIconWrap: {
-    width: s(28),
+    width: s(30),
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(8),
   },
-  locationIconImage: {
+
+  paperPlaneIcon: {
     width: s(20),
     height: s(20),
   },
+
+  locationPinIcon: {
+    width: s(23),
+    height: s(23),
+  },
+
   locationText: {
     flex: 1,
+    paddingRight: s(40),
   },
+
   locationLabel: {
-    color: '#665B6D',
-    fontSize: s(11),
+    color: '#6C6172',
     fontFamily: 'Karla_400Regular',
-    marginBottom: s(7),
+    fontSize: s(11),
+    lineHeight: s(14),
+    marginBottom: s(6),
   },
+
   locationValue: {
     color: '#261038',
-    fontSize: s(14),
     fontFamily: 'Karla_700Bold',
+    fontSize: s(14),
+    lineHeight: s(17),
   },
+
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#D8D3D9',
+    backgroundColor: '#D7D2D9',
     marginLeft: s(1),
   },
+
   swapButton: {
     position: 'absolute',
-    right: s(18),
-    top: s(76),
-    width: s(40),
-    height: s(40),
+    right: s(17),
+    top: s(75),
+    width: s(39),
+    height: s(39),
     borderRadius: s(20),
     backgroundColor: '#210C33',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: s(2) },
+    shadowOpacity: 0.2,
+    shadowRadius: s(3),
+    elevation: 3,
   },
-  swapText: {
-    color: '#FFFFFF',
-    fontSize: s(22),
-    lineHeight: s(24),
-    fontFamily: 'Karla_700Bold',
+
+  swapIcon: {
+    width: s(20),
+    height: s(20),
   },
+
   sectionTitle: {
     marginHorizontal: s(34),
-    marginTop: s(30),
-    marginBottom: s(17),
+    marginTop: s(29),
+    marginBottom: s(16),
     color: '#251039',
-    fontSize: s(14),
     fontFamily: 'Karla_700Bold',
+    fontSize: s(14),
+    lineHeight: s(18),
   },
+
   tripCard: {
     marginHorizontal: s(32),
-    height: s(48),
+    height: s(50),
     backgroundColor: '#FFFFFF',
     borderRadius: s(13),
-    marginBottom: s(31),
-    paddingHorizontal: s(16),
+    marginBottom: s(22),
+    paddingHorizontal: s(14),
     flexDirection: 'row',
     alignItems: 'center',
   },
+
   tripIcon: {
-    width: s(38),
-    height: s(38),
+    width: s(37),
+    height: s(37),
     borderRadius: s(19),
-    backgroundColor: '#D9C7E6',
+    backgroundColor: '#DCCBE8',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: s(11),
   },
+
   tripIconImage: {
     width: s(22),
     height: s(22),
   },
+
   tripInfo: {
     flex: 1,
   },
+
   tripTitle: {
     color: '#251039',
-    fontSize: s(12),
     fontFamily: 'Karla_700Bold',
-    marginBottom: s(2),
+    fontSize: s(12),
+    lineHeight: s(15),
+    marginBottom: s(1),
   },
+
   tripSubtitle: {
     color: '#756A7B',
-    fontSize: s(9),
     fontFamily: 'Karla_400Regular',
+    fontSize: s(9),
+    lineHeight: s(12),
   },
+
   tripTime: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: s(4),
     marginRight: s(4),
+    gap: s(4),
   },
-  bolt: {
-    color: '#210C33',
-    fontSize: s(14),
-    fontFamily: 'Karla_800ExtraBold',
+
+  tripBolt: {
+    width: s(12),
+    height: s(12),
+    tintColor: '#210C33',
   },
+
   tripTimeText: {
     color: '#251039',
-    fontSize: s(9),
     fontFamily: 'Karla_700Bold',
+    fontSize: s(9),
+    lineHeight: s(12),
   },
+
   planButton: {
     marginHorizontal: s(56),
-    marginTop: s(20),
-    height: s(59),
+    marginTop: s(7),
+    height: s(58),
     borderRadius: s(14),
     backgroundColor: '#210C33',
     alignItems: 'center',
@@ -418,16 +462,18 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: s(4) },
     shadowOpacity: 0.22,
-    shadowRadius: s(4),
+    shadowRadius: s(5),
     elevation: 5,
   },
+
   planButtonText: {
     color: '#FFFFFF',
-    fontSize: s(14),
     fontFamily: 'Karla_500Medium',
+    fontSize: s(14),
+    lineHeight: s(18),
   },
-  // ==================== NAVBAR ====================
-  // Esta é a mesma estrutura visual usada na HomeScreen.
+
+  /* ==================== NAVBAR — HOME ==================== */
   navContainer: {
     position: 'absolute',
     bottom: 0,
@@ -436,6 +482,7 @@ const styles = StyleSheet.create({
     height: NAV_BAR_HEIGHT + wp(8),
     alignItems: 'center',
   },
+
   navBarBg: {
     position: 'absolute',
     bottom: 0,
@@ -444,12 +491,14 @@ const styles = StyleSheet.create({
     height: NAV_BAR_HEIGHT,
     backgroundColor: '#E8E8E8',
   },
+
   navCurveWrapper: {
     position: 'absolute',
     top: 0,
     alignSelf: 'center',
     zIndex: 5,
   },
+
   navCenterBtn: {
     position: 'absolute',
     top: wp(2),
@@ -461,11 +510,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
+    shadowColor: '#440769',
+    shadowOffset: { width: 0, height: s(3) },
+    shadowOpacity: 0.7,
+    shadowRadius: s(3),
+    elevation: 6,
   },
+
   navCenterIcon: {
     width: NAV_BUTTON_SIZE * 0.45,
     height: NAV_BUTTON_SIZE * 0.45,
   },
+
   navTabsRow: {
     position: 'absolute',
     bottom: hp(2),
@@ -476,16 +532,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: wp(4),
   },
+
   navTab: {
     alignItems: 'center',
     justifyContent: 'center',
     width: wp(10),
     height: wp(10),
   },
+
   navTabIcon: {
     width: wp(8.5),
     height: wp(8.5),
   },
+
   navSpacer: {
     width: NAV_BUTTON_SIZE + wp(6),
   },
