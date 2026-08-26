@@ -10,7 +10,7 @@ import {
   Karla_800ExtraBold,
 } from '@expo-google-fonts/karla';
 import * as SplashScreen from 'expo-splash-screen';
-import HomeScreen from './src/screens/HomeScreen';
+import ViagemScreen from './src/screens/ViagemScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,5 +35,5 @@ export default function App() {
     return null;
   }
 
-  return <HomeScreen />;
+  return <ViagemScreen />;
 }
