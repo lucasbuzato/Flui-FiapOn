@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Dimensions,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -10,10 +11,35 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 
-const { width } = Dimensions.get('window');
-const scale = Math.min(width / 393, 1.15);
+const { width: W, height: H } = Dimensions.get('window');
+const scale = Math.min(W / 393, 1.15);
 const s = (value: number) => Math.round(value * scale);
+const wp = (pct: number) => (pct / 100) * W;
+const hp = (pct: number) => (pct / 100) * H;
+
+// ============================================================
+// ASSETS DA TELA
+// ============================================================
+// Navbar: reutiliza exatamente os mesmos assets da HomeScreen.
+const homeIcon = require('../../assets/images/home.png');
+const roadIcon = require('../../assets/images/road.png');
+const bookmarkIcon = require('../../assets/images/bookmark.png');
+const usersIcon = require('../../assets/images/users.png');
+const lightningBolt = require('../../assets/images/lightning-bolt.png');
+
+// Imagens específicas desta tela.
+// Você pode trocar os links abaixo por assets locais quando tiver as imagens.
+// Ex.: const TRAVEL_ILLUSTRATION = require('../../assets/images/viagem.png');
+const TRAVEL_ILLUSTRATION_URI = 'COLOQUE_AQUI_O_LINK_DA_ILUSTRACAO_DA_VIAGEM';
+const ORIGIN_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DE_ORIGEM';
+const DESTINATION_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DE_DESTINO';
+const HOME_TRIP_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DA_VIAGEM_1';
+const CAR_TRIP_ICON_URI = 'COLOQUE_AQUI_O_LINK_DO_ICONE_DA_VIAGEM_2';
+
+const NAV_BAR_HEIGHT = hp(8);
+const NAV_BUTTON_SIZE = wp(14);
 
 function Shadow({ children, style }: { children: React.ReactNode; style?: any }) {
   return <View style={[styles.shadow, style]}>{children}</View>;
@@ -23,17 +49,21 @@ function RecentTrip({
   title,
   subtitle,
   time,
-  type,
+  iconUri,
 }: {
   title: string;
   subtitle: string;
   time: string;
-  type: 'home' | 'car';
+  iconUri: string;
 }) {
   return (
     <Shadow style={styles.tripCard}>
       <View style={styles.tripIcon}>
-        <Text style={styles.tripIconText}>{type === 'home' ? '⌂' : '▣'}</Text>
+        <Image
+          source={{ uri: iconUri }}
+          style={styles.tripIconImage}
+          resizeMode="contain"
+        />
       </View>
       <View style={styles.tripInfo}>
         <Text style={styles.tripTitle}>{title}</Text>
@@ -74,20 +104,24 @@ export default function ViagemScreen() {
             </Text>
           </View>
 
-          {/* Placeholder: replace with the travel/map illustration asset later. */}
+          {/* Imagem principal da viagem: troque TRAVEL_ILLUSTRATION_URI pelo link/asset final. */}
           <View style={styles.mapPlaceholder}>
-            <View style={styles.mapShape}>
-              <View style={[styles.pin, styles.pinTop]} />
-              <View style={[styles.pin, styles.pinBottom]} />
-              <View style={styles.routeLine} />
-            </View>
+            <Image
+              source={{ uri: TRAVEL_ILLUSTRATION_URI }}
+              style={styles.travelIllustration}
+              resizeMode="contain"
+            />
           </View>
         </View>
 
         <Shadow style={styles.routeCard}>
           <View style={styles.locationRow}>
             <View style={styles.locationIconWrap}>
-              <Text style={styles.locationIcon}>▶</Text>
+              <Image
+                source={{ uri: ORIGIN_ICON_URI }}
+                style={styles.locationIconImage}
+                resizeMode="contain"
+              />
             </View>
             <View style={styles.locationText}>
               <Text style={styles.locationLabel}>De onde você está saindo?</Text>
@@ -99,7 +133,11 @@ export default function ViagemScreen() {
 
           <View style={styles.locationRow}>
             <View style={styles.locationIconWrap}>
-              <Text style={styles.locationIcon}>⌖</Text>
+              <Image
+                source={{ uri: DESTINATION_ICON_URI }}
+                style={styles.locationIconImage}
+                resizeMode="contain"
+              />
             </View>
             <View style={styles.locationText}>
               <Text style={styles.locationLabel}>Para onde você vai?</Text>
@@ -118,13 +156,13 @@ export default function ViagemScreen() {
           title="Casa na Praia"
           subtitle="Ponta Grossa"
           time="40 min"
-          type="home"
+          iconUri={HOME_TRIP_ICON_URI}
         />
         <RecentTrip
           title="Beto Carreiro"
           subtitle="Santa Catarina"
           time="2:30 h"
-          type="car"
+          iconUri={CAR_TRIP_ICON_URI}
         />
 
         <Pressable style={styles.planButton} accessibilityRole="button">
@@ -132,24 +170,55 @@ export default function ViagemScreen() {
         </Pressable>
       </ScrollView>
 
-      <View style={styles.bottomNav}>
-        <Pressable style={styles.navItem} accessibilityLabel="Início">
-          <Text style={styles.navIcon}>⌂</Text>
-        </Pressable>
-        <Pressable style={styles.navItem} accessibilityLabel="Viagens">
-          <Text style={[styles.navIcon, styles.activeNavIcon]}>▰</Text>
-        </Pressable>
-        <View style={styles.centerNavSpace} />
-        <Pressable style={styles.navItem} accessibilityLabel="Salvos">
-          <Text style={styles.navIcon}>▾</Text>
-        </Pressable>
-        <Pressable style={styles.navItem} accessibilityLabel="Comunidade">
-          <Text style={styles.navIcon}>♟</Text>
+      {/* Bottom Navigation Bar — reutilizada da HomeScreen */}
+      <View style={styles.navContainer}>
+        <View style={styles.navBarBg} />
+
+        <View style={styles.navCurveWrapper}>
+          <Svg
+            width={wp(44)}
+            height={wp(19)}
+            viewBox="0 0 167.589 72.7941"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <Path
+              d="M131.802 21.8891C110.161 29.1486 140.012 72.7941 84.5957 72.7941C29.1792 72.7941 62.4196 29.1839 39.4415 21.8891C-63.1819 -10.69 64.5698 21.8891 84.5957 21.8891C104.622 21.8891 226.9 -10.0113 131.802 21.8891Z"
+              fill="#F5F5F5"
+            />
+          </Svg>
+        </View>
+
+        <Pressable
+          style={styles.navCenterBtn}
+          accessibilityLabel="Carregar"
+        >
+          <Image
+            source={lightningBolt}
+            style={styles.navCenterIcon}
+            resizeMode="contain"
+            tintColor="#FFFFFF"
+          />
         </Pressable>
 
-        <Pressable style={styles.centerButton} accessibilityLabel="Carregamento">
-          <Text style={styles.centerButtonIcon}>ϟ</Text>
-        </Pressable>
+        <View style={styles.navTabsRow}>
+          <Pressable style={styles.navTab} accessibilityLabel="Início">
+            <Image source={homeIcon} style={styles.navTabIcon} resizeMode="contain" />
+          </Pressable>
+
+          <Pressable style={styles.navTab} accessibilityLabel="Viagens">
+            <Image source={roadIcon} style={styles.navTabIcon} resizeMode="contain" />
+          </Pressable>
+
+          <View style={styles.navSpacer} />
+
+          <Pressable style={styles.navTab} accessibilityLabel="Salvos">
+            <Image source={bookmarkIcon} style={styles.navTabIcon} resizeMode="contain" />
+          </Pressable>
+
+          <Pressable style={styles.navTab} accessibilityLabel="Comunidade">
+            <Image source={usersIcon} style={styles.navTabIcon} resizeMode="contain" />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -204,45 +273,10 @@ const styles = StyleSheet.create({
     marginRight: s(-23),
     alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '-7deg' }],
   },
-  mapShape: {
-    width: s(145),
-    height: s(94),
-    borderRadius: s(8),
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    borderWidth: s(3),
-    borderColor: '#EDE5F5',
-    transform: [{ skewX: '-10deg' }],
-    position: 'relative',
-  },
-  pin: {
-    position: 'absolute',
-    width: s(17),
-    height: s(17),
-    borderRadius: s(9),
-    backgroundColor: '#7D38E8',
-    borderWidth: s(3),
-    borderColor: '#FFFFFF',
-    zIndex: 3,
-  },
-  pinTop: {
-    top: s(-12),
-    right: s(30),
-  },
-  pinBottom: {
-    bottom: s(-8),
-    left: s(43),
-  },
-  routeLine: {
-    position: 'absolute',
-    width: s(72),
-    height: s(4),
-    backgroundColor: '#7430DD',
-    borderRadius: s(2),
-    right: s(20),
-    top: s(31),
-    transform: [{ rotate: '35deg' }],
+  travelIllustration: {
+    width: '100%',
+    height: '100%',
   },
   shadow: {
     shadowColor: '#000000',
@@ -272,10 +306,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: s(8),
   },
-  locationIcon: {
-    color: '#251039',
-    fontSize: s(20),
-    fontFamily: 'Karla_700Bold',
+  locationIconImage: {
+    width: s(20),
+    height: s(20),
   },
   locationText: {
     flex: 1,
@@ -340,10 +373,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: s(11),
   },
-  tripIconText: {
-    color: '#271039',
-    fontSize: s(20),
-    fontFamily: 'Karla_700Bold',
+  tripIconImage: {
+    width: s(22),
+    height: s(22),
   },
   tripInfo: {
     flex: 1,
@@ -394,59 +426,67 @@ const styles = StyleSheet.create({
     fontSize: s(14),
     fontFamily: 'Karla_500Medium',
   },
-  bottomNav: {
+  // ==================== NAVBAR ====================
+  // Esta é a mesma estrutura visual usada na HomeScreen.
+  navContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: s(89),
-    backgroundColor: '#F1F1F1',
+    height: NAV_BAR_HEIGHT + wp(8),
+    alignItems: 'center',
+  },
+  navBarBg: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: NAV_BAR_HEIGHT,
+    backgroundColor: '#E8E8E8',
+  },
+  navCurveWrapper: {
+    position: 'absolute',
+    top: 0,
+    alignSelf: 'center',
+    zIndex: 5,
+  },
+  navCenterBtn: {
+    position: 'absolute',
+    top: wp(2),
+    alignSelf: 'center',
+    width: NAV_BUTTON_SIZE,
+    height: NAV_BUTTON_SIZE,
+    borderRadius: NAV_BUTTON_SIZE / 2,
+    backgroundColor: '#210C33',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  navCenterIcon: {
+    width: NAV_BUTTON_SIZE * 0.45,
+    height: NAV_BUTTON_SIZE * 0.45,
+  },
+  navTabsRow: {
+    position: 'absolute',
+    bottom: hp(2),
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: s(26),
-    borderTopLeftRadius: s(22),
-    borderTopRightRadius: s(22),
-    ...(Platform.OS === 'web' ? { boxShadow: '0px -2px 8px rgba(0,0,0,0.08)' } : {}),
+    justifyContent: 'space-around',
+    paddingHorizontal: wp(4),
   },
-  navItem: {
-    flex: 1,
+  navTab: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: wp(10),
+    height: wp(10),
   },
-  navIcon: {
-    color: '#777777',
-    fontSize: s(27),
-    fontFamily: 'Karla_700Bold',
+  navTabIcon: {
+    width: wp(8.5),
+    height: wp(8.5),
   },
-  activeNavIcon: {
-    color: '#210C33',
-  },
-  centerNavSpace: {
-    width: s(82),
-  },
-  centerButton: {
-    position: 'absolute',
-    left: '50%',
-    top: s(-19),
-    marginLeft: s(-30),
-    width: s(60),
-    height: s(60),
-    borderRadius: s(30),
-    backgroundColor: '#210C33',
-    borderWidth: s(7),
-    borderColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: s(3) },
-    shadowOpacity: 0.2,
-    shadowRadius: s(4),
-    elevation: 6,
-  },
-  centerButtonIcon: {
-    color: '#FFFFFF',
-    fontSize: s(30),
-    lineHeight: s(32),
-    fontFamily: 'Karla_800ExtraBold',
+  navSpacer: {
+    width: NAV_BUTTON_SIZE + wp(6),
   },
 });
