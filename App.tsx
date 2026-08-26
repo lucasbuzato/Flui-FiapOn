@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import {
   Karla_200ExtraLight,
@@ -10,7 +10,9 @@ import {
   Karla_800ExtraBold,
 } from '@expo-google-fonts/karla';
 import * as SplashScreen from 'expo-splash-screen';
+import HomeScreen from './src/screens/HomeScreen';
 import ViagemScreen from './src/screens/ViagemScreen';
+import BottomNav, { NavTab } from './src/components/BottomNav';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,6 +27,9 @@ export default function App() {
     Karla_800ExtraBold,
   });
 
+  const [screen, setScreen] = useState<'home' | 'travel'>('home');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
+
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
@@ -35,5 +40,22 @@ export default function App() {
     return null;
   }
 
-  return <ViagemScreen />;
+  const handleNavigate = (tab: NavTab) => {
+    setActiveTab(tab);
+
+    if (tab === 'home') {
+      setScreen('home');
+    } else if (tab === 'travel') {
+      setScreen('travel');
+    }
+    // Salvos e Comunidade ainda não possuem telas.
+    // Mesmo assim, o ícone fica ativo quando selecionado.
+  };
+
+  return (
+    <>
+      {screen === 'home' ? <HomeScreen /> : <ViagemScreen />}
+      <BottomNav activeTab={activeTab} onNavigate={handleNavigate} />
+    </>
+  );
 }
